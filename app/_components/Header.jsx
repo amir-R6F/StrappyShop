@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Image from "next/image";
 import {LayoutGrid, Search, ShoppingBag} from "lucide-react";
 import {Button} from "@/components/ui/button";
@@ -15,16 +15,20 @@ import {
 import globalApi from "@/app/_utils/GlobalApi.jsx";
 
 function Header() {
-    useEffect(()=>{
+
+    const [categoryList, setCategoryList] = useState([]);
+
+    useEffect(() => {
         getCategoryList();
     }, [])
-    
+
     const getCategoryList = () => {
-      globalApi.getCategory().then(res =>{
-          console.log(res)
-      })
+        globalApi.getCategory().then(res => {
+            console.log(res.data.data)
+            setCategoryList(res.data.data)
+        })
     }
-    
+
     return (
         <div className={'flex p-5 shadow-sm justify-between'}>
             <div className="flex items-center gap-8">
@@ -38,12 +42,21 @@ function Header() {
                         </h2>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuLabel>Browse Category</DropdownMenuLabel>
+                        <DropdownMenuLabel className={"font-bold"}>Browse Category</DropdownMenuLabel>
                         <DropdownMenuSeparator/>
-                        <DropdownMenuItem>Profile</DropdownMenuItem>
-                        <DropdownMenuItem>Billing</DropdownMenuItem>
-                        <DropdownMenuItem>Team</DropdownMenuItem>
-                        <DropdownMenuItem>Subscription</DropdownMenuItem>
+                        {categoryList.map((category, index) => (
+                            <DropdownMenuItem className={"flex gap-4 items-center cursor-pointer"} key={index}>
+                                <Image src={process.env.NEXT_PUBLIC_STRAPPY_BASE_URL + category.icon[0].url}
+                                    alt="icon"
+                                    width={23}
+                                    height={23}
+                                    unoptimized
+                                />
+
+                                <h2>{category?.name}</h2>
+                            </DropdownMenuItem>
+                        ))}
+
                     </DropdownMenuContent>
                 </DropdownMenu>
 
